@@ -22,85 +22,60 @@
  * @copyright  2013 Radu Dumbrăveanu  {@link http://vundicind.blogspot.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require("../../config.php");
+require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 
 $id = required_param('id', PARAM_INT);   // course id
 
 $course = $DB->get_record('course', array('id' => $id), '*', MUST_EXIST);
 
 require_course_login($course, true);
-$PAGE->set_pagelayout('incourse');
 
 add_to_log($course->id, 'pdfparts', 'view all', "index.php?id=$course->id", '');
 
-$strpdfparts       = get_string('modulename', 'pdfparts');
-$strpdfpartss      = get_string('modulenameplural', 'pdfparts');
-$strsectionname  = get_string('sectionname', 'format_'.$course->format);
-$strname         = get_string('name');
-$strintro        = get_string('moduleintro');
-$strlastmodified = get_string('lastmodified');
+$coursecontext = get_context_instance(CONTEXT_COURSE, $course->id);
 
 $PAGE->set_url('/mod/pdfparts/index.php', array('id' => $course->id));
 $PAGE->set_title($course->shortname.': '.$strpdfpartss);
 $PAGE->set_heading($course->fullname);
 $PAGE->navbar->add($strpdfpartss);
+$PAGE->set_context($coursecontext);
+
 echo $OUTPUT->header();
 
 if (!$pdfpartss = get_all_instances_in_course('pdfparts', $course)) {
     notice(get_string('thereareno', 'moodle', $strpdfpartss), "$CFG->wwwroot/course/view.php?id=$course->id");
-    exit;
 }
 
-$usesections = course_format_uses_sections($course->format);
-
-$table = new html_table();
-$table->attributes['class'] = 'generaltable mod_index';
-
-if ($usesections) {
-    $table->head  = array ($strsectionname, $strname, $strintro);
-    $table->align = array ('center', 'left', 'left');
+if ($course->format == 'weeks') {
+    $table->head = array(get_string('week'), get_string('name'));
+    $table->align = array('center', 'left');
+} else if ($course->format == 'topics') {
+    $table->head = array(get_string('topic'), get_string('name'));
+    $table->align = array('center', 'left', 'left', 'left');
 } else {
-    $table->head  = array ($strlastmodified, $strname, $strintro);
-    $table->align = array ('left', 'left', 'left');
+    $table->head = array(get_string('name'));
+    $table->align = array('left', 'left', 'left');
 }
 
-$modinfo = get_fast_modinfo($course);
-$currentsection = '';
 foreach ($pdfpartss as $pdfparts) {
-    $cm = $modinfo->cms[$pdfparts->coursemodule];
-    if ($usesections) {
-        $printsection = '';
-        if ($pdfparts->section !== $currentsection) {
-            if ($pdfparts->section) {
-                $printsection = get_section_name($course, $pdfparts->section);
-            }
-            if ($currentsection !== '') {
-                $table->data[] = 'hr';
-            }
-            $currentsection = $url->section;
-        }
+    if (!$pdfparts->visible) {
+        $link = html_writer::link(
+            new moodle_url('/mod/pdfparts.php', array('id' => $pdfparts->coursemodule)),
+            format_string($pdfparts->name, true),
+            array('class' => 'dimmed'));
     } else {
-        $printsection = '<span class="smallinfo">'.userdate($pdfparts->timemodified)."</span>";
+        $link = html_writer::link(
+            new moodle_url('/mod/pdfparts.php', array('id' => $pdfparts->coursemodule)),
+            format_string($pdfparts->name, true));
     }
 
-//    $extra = empty($cm->extra) ? '' : $cm->extra;
-//    $icon = '';
-//    if (!empty($cm->icon)) {
-//        // each pdfparts has an icon in 2.0
-//        $icon = '<img src="'.$OUTPUT->pix_url($cm->icon).'" class="activityicon" alt="'.get_string('modulename', $cm->modname).'" /> ';
-//    }    
-
-    $class = $pdfparts->visible ? 'class="123"' : 'class="dimmed"'; // hidden modules are dimmed
-//    $table->data[] = array (
-//        $printsection,
-//        "<a $class $extra href=\"view.php?id=$cm->id\">".format_string($pdfparts->name)."</a>",
-//        format_module_intro('pdfparts', $pdfparts, $cm->id));
-    $table->data[] = array (
-        $printsection,
-        html_writer::link(new moodle_url('view.php', array('id' => $cm->id)), format_string($pdfparts->name), $class),
-        format_module_intro('pdfparts', $pdfparts, $cm->id));
+    if ($course->format == 'weeks' or $course->format == 'topics') {
+        $table->data[] = array($pdfparts->section, $link);
+    } else {
+        $table->data[] = array($link);
+    }
 }
 
+echo $OUTPUT->heading(get_string('modulenameplural', 'pdfparts'), 2);
 echo html_writer::table($table);
-
 echo $OUTPUT->footer();
