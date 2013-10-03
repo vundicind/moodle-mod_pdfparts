@@ -45,7 +45,8 @@ function pdfparts_get_final_display_type($pdfparts) {
     if ($pdfparts->display == RESOURCELIB_DISPLAY_AUTO) {
         // In perfect world here we should test what current browser can support.
         // For example, if it can not open a PDF file then change the display type to DOWNLOAD etc.
-        return RESOURCELIB_DISPLAY_OPEN;
+        //return RESOURCELIB_DISPLAY_OPEN;
+        return RESOURCELIB_DISPLAY_DOWNLOAD;
     }
 
     if (empty($pdfparts->mainfile)) {
@@ -89,9 +90,11 @@ function pdfparts_set_mainfile($data) {
  * @return array array of ranges
  */
 function pdfparts_parse_page_range($pdfparts, $pdfpagecount) {
-    header("Content-type: text/html"); 
-    echo($pdfparts->pages);
-    
+    if(empty($pdfparts->pages)) {
+        $pdfparts->pages = "1-$pdfpagecount";
+        return array(1, $pdfpagecount);
+    }
+
 	$anarray = explode(",", $pdfparts->pages);
 	foreach ($anarray as &$value) {
 		if(!strstr($value, "-")) {
