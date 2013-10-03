@@ -24,7 +24,5 @@ PDFParts module was inspired from PDF Page Limiter (mod_pdfpager) by Geoff Eggin
 
 
 TODO:
-* In the "Add an activity or resource" dialog pdfparts must be in the "Resources" category not in "Activities".
-* Instances form course must have plugin provided icons not PDF icons as if we uploaded a standard file.
 * The extracted pages are generated every time must work with the cache. 
 * Set an action when user did not specify the "Pages" setting

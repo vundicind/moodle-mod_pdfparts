@@ -33,6 +33,7 @@ defined('MOODLE_INTERNAL') || die();
  */
 function pdfparts_supports($feature) {
     switch($feature) {
+        case FEATURE_MOD_ARCHETYPE:     return MOD_ARCHETYPE_RESOURCE; // this plugin is a 'Resource' not an 'Activity'
         case FEATURE_MOD_INTRO:         return true;
         default:                        return null;
     }
@@ -170,22 +171,16 @@ function pdfparts_get_coursemodule_info($coursemodule) {
 
     $context = context_module::instance($coursemodule->id);
 
-    if (!$data = $DB->get_record('pdfparts', array('id'=>$coursemodule->instance), 'id, name, revision')) {
+    if (!$pdfparts = $DB->get_record('pdfparts', array('id'=>$coursemodule->instance), 'id, name, revision')) {
         return null;
     }
 
     $info = new cached_cm_info();
-    $info->name = $data->name;
+    $info->name = $pdfparts->name;
+    // we want to use the default module icon instead of the PDF file icon.
+    $info->icon = null;
 
-    $fs = get_file_storage();
-    $files = $fs->get_area_files($context->id, 'mod_pdfparts', 'content', 0, 'sortorder DESC, id ASC', false); // TODO: this is not very efficient!!
-    if (count($files) >= 1) {
-        $mainfile = reset($files);
-        $info->icon = file_file_icon($mainfile, 24);
-        $data->mainfile = $mainfile->get_filename();
-    }
-
-    $display = pdfparts_get_final_display_type($data);
+    $display = pdfparts_get_final_display_type($pdfparts);
 
     if ($display == RESOURCELIB_DISPLAY_POPUP) {
         $fullurl = "$CFG->wwwroot/mod/pdfparts/view.php?id=$coursemodule->id&amp;redirect=1";
@@ -198,7 +193,11 @@ function pdfparts_get_coursemodule_info($coursemodule) {
     } else if ($display == RESOURCELIB_DISPLAY_NEW) {
         $fullurl = "$CFG->wwwroot/mod/pdfparts/view.php?id=$coursemodule->id&amp;redirect=1";
         $info->extra = "onclick=\"window.open('$fullurl'); return false;\"";
-
+    }
+    
+    if ($coursemodule->showdescription) {
+        // Convert intro to html. Do not filter cached version, filters run at display time.
+        $info->content = format_module_intro('pdfparts', $pdfparts, $coursemodule->id, false);
     }
 
     return $info;
