@@ -45,8 +45,7 @@ function pdfparts_get_final_display_type($pdfparts) {
     if ($pdfparts->display == RESOURCELIB_DISPLAY_AUTO) {
         // In perfect world here we should test what current browser can support.
         // For example, if it can not open a PDF file then change the display type to DOWNLOAD etc.
-        //return RESOURCELIB_DISPLAY_OPEN;
-        return RESOURCELIB_DISPLAY_DOWNLOAD;
+        return RESOURCELIB_DISPLAY_OPEN;
     }
 
     if (empty($pdfparts->mainfile)) {
@@ -198,9 +197,10 @@ function pdfparts_display_frame($pdfparts, $cm, $course, $file) {
 function pdfparts_display_open($pdfparts, $cm, $course, $file) {
     $pdfdata = pdfparse_pdf_zend_extract($pdfparts, $file);
     if($pdfdata != null) {
-        header("Content-type: application/x-pdf"); 
-        header('Last-Modified: '.gmdate('D, d M Y H:i:s', $pdfparts->timemodified).' GMT', true, 200);
-        //header("Content-Length:");
+        header("Content-Disposition: inline; filename=\"$pdfparts->name (p$pdfparts->pages)\"");    
+        header("Last-Modified: ".gmdate('D, d M Y H:i:s', $pdfparts->timemodified)." GMT", true, 200);
+        //header("Content-Length: ".strlen($pdfdata));
+        header("Content-type: application/pdf");
         echo $pdfdata;
     }
 }
@@ -217,10 +217,10 @@ function pdfparts_display_open($pdfparts, $cm, $course, $file) {
 function pdfparts_display_download($pdfparts, $cm, $course, $file) {
     $pdfdata = pdfparse_pdf_zend_extract($pdfparts, $file);
     if($pdfdata != null) {
-        header("Content-type: application/x-pdf");    
         //header("Content-Disposition: inline; filename=\"$file->get_filename()_$pdfparts->pages\"");//-RD01102013
         header("Content-Disposition: inline; filename=\"$pdfparts->name (p$pdfparts->pages)\"");
-        //header("Content-Length:");
+        header("Last-Modified: ".gmdate('D, d M Y H:i:s', $pdfparts->timemodified)." GMT", true, 200);
+        header("Content-type: application/x-pdf");
         echo $pdfdata;
     }
 }

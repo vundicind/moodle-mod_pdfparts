@@ -37,8 +37,8 @@ if ($ADMIN->fulltree) {
                                                            RESOURCELIB_DISPLAY_POPUP,
                                                           ));
     $defaultdisplayoptions = array(RESOURCELIB_DISPLAY_AUTO,
+                                   RESOURCELIB_DISPLAY_OPEN,    
                                    RESOURCELIB_DISPLAY_DOWNLOAD,
-                                   RESOURCELIB_DISPLAY_OPEN,
                                   );
 
     //--- general settings -----------------------------------------------------------------------------------
@@ -58,7 +58,7 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configcheckbox('resource/printintro',
         get_string('printintro', 'pdfparts'), get_string('printintroexplain', 'pdfparts'), 1));
     $settings->add(new admin_setting_configselect('pdfparts/display',
-        get_string('displayselect', 'pdfparts'), get_string('displayselectexplain', 'pdfparts'), RESOURCELIB_DISPLAY_DOWNLOAD, $displayoptions));
+        get_string('displayselect', 'pdfparts'), get_string('displayselectexplain', 'pdfparts'), RESOURCELIB_DISPLAY_OPEN, $displayoptions));
     $settings->add(new admin_setting_configtext('pdfparts/popupwidth',
         get_string('popupwidth', 'resource'), get_string('popupwidthexplain', 'pdfparts'), 620, PARAM_INT, 7));
     $settings->add(new admin_setting_configtext('pdfparts/popupheight',
