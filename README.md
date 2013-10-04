@@ -22,8 +22,10 @@ The module accepts an optional GET parameter called "pages" which will override 
 
 Suppose the Teacher added a PDFParts module to course with the id: 4720. Then he can build links in this format: 
 
-* http://<MOODLE_SERVER>/mod/pdfparts/view.php?id=4720&pages=2,4
-* http://<MOODLE_SERVER>/mod/pdfparts/view.php?id=4720&pages=2-4,7,8,10-12
+```
+    http://<MOODLE_SERVER>/mod/pdfparts/view.php?id=4720&pages=2,4
+    http://<MOODLE_SERVER>/mod/pdfparts/view.php?id=4720&pages=2-4,7,8,10-12
+```
 
 in order to provide the students with the precise pages where the needed information resides, for example the page with the solution to an exercise, or a page with the definition of a term.
 
