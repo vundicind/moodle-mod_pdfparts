@@ -42,7 +42,7 @@ Credits (acknowledge)
 
 The PDFParts module was created based on an idea that came to me after seeing the PDF Page Limiter (mod_pdfpager) module by Geoff Eggins.
 
-The logo is a compilation of two icons from https://openclipart.org: 
+The logo is a compilation of two icons from https://openclipart.org : 
 
 1. https://openclipart.org/detail/78169/office-notes-line-drawing-by-sheikh_tuhin
 2. https://openclipart.org/detail/171857/icon-pdf---%C3%8Dcone-by-leandrosciola@gmail.com-171857
